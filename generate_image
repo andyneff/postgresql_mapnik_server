@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+OUTPUT_DIR=$(pwd)/output
+OSM_SERVER=osm_server
+IMAGE=andyneff/mapnik_generate
+
+SOURCE_DIR=$(cd $(dirname ${BASH_SOURCE[0]}); pwd) 
+
+function print_usage() {
+  echo "$0 [-o output_dir] [-c osm_server_container_name/id] [-i image_name]"
+  echo
+  echo "    Defaults:"
+  echo "    output_dir default is ${OUTPUT_DIR}"
+  echo "    osm_server_container_name/id default is ${OSM_SERVER}"
+  echo "    image_name is ${IMAGE}"
+}
+
+if [[ $# == 0 ]]; then
+  print_usage
+  exit 1
+fi
+
+set -xv
+docker run -it --rm -v ${OUTPUT_DIR}:/output --link ${OSM_SERVER}:osm_server \
+           -v ${SOURCE_DIR}/context/generate_image.py:/generate_image.py \
+           -v ${SOURCE_DIR}/style:/style:ro ${IMAGE} "${@}"

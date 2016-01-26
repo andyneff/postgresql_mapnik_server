@@ -1,0 +1,11 @@
+FROM andyneff/openstreetmap_database
+
+MAINTAINER Andy Neff <andrew.neff@visionsystemsinc.com>
+
+ADD generate_image.py /generate_image.py
+
+VOLUME /style
+
+WORKDIR /style
+
+ENTRYPOINT /generate_image.py
