@@ -1,19 +1,15 @@
 IMAGE_NAME = andyneff/openstreetmap_database
 CONTAINER_NAME = osm_server
 DOCKERFILE = Dockerfile
-GENERATE_IMAGE_NAME = andyneff/mapnik_generate
-GENERATE_DOCKERFILE = Dockerfile.generate
-
 DATA_DIR = $$(pwd)/data
+OUTPUT_DIR = $$(pwd)/output
 
 MOUNTS = $(DATA_DIR):/var/lib/postgresql/data \
-         $$(pwd)/style:/style:ro
-
-GENERATE_MOUNTS = $$(pwd)/context/generate_image.py:/geneate_image.py:ro
-                  $$(pwd)/output:/output
+         $$(pwd)/style:/style:ro \
+         $(OUTPUT_DIR):/output \
+         $$(pwd)/context/generate_image.py:/generate_image.py:ro
 
 MOUNTS := $(addprefix -v ,$(MOUNTS))
-GENERATE_MOUNTS := $(addprefix -v ,$(GENERATE_MOUNTS))
 
 RESTART_POLICY = always
 #The restart policy used when you start_service. Can be (on-failure[:max-retry],
@@ -25,15 +21,12 @@ RESTART_POLICY = always
 
 build:
 	docker build -t $(IMAGE_NAME) context
-	docker build -t $(GENERATE_IMAGE_NAME) -f context/Dockerfile.generate context
 
 pull:
 	docker pull $(IMAGE_NAME)
-	docker pull $(GENERATE_IMAGE_NAME)
 
 push:
 	docker push $(IMAGE_NAME)
-	docker push $(GENERATE_IMAGE_NAME)
 
 clean:
 	if docker inspect $(CONTAINER_NAME) > /dev/null 2>&1; then \
@@ -59,7 +52,10 @@ start_service:
 stop_service:
 
 wait:
-	@while docker inspect $(CONTAINER_NAME) > /dev/null 2>&1; do \
+	while docker inspect $(CONTAINER_NAME) > /dev/null 2>&1; do \
+	  if [ "$$(docker inspect -f '{{.State.Status}}' $(CONTAINER_NAME))" == "exited" ]; then \
+	    break; \
+	  fi; \
 	  sleep 0.3; \
 	done
 

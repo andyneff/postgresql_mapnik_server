@@ -20,6 +20,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
 
 # Development python-yaml python-numpy libopenblas-base runy
 
+# Look into using Nik4 for rendering https://github.com/Zverik/Nik4
+
 ENV OSM_USER=osm \
     OSM_DB=gis
 
@@ -28,4 +30,5 @@ RUN chmod 755 /docker-entrypoint-initdb.d/*.sh
 
 EXPOSE 5432
 
-#RUN postgres --single -jE
+VOLUME /style
+WORKDIR /style

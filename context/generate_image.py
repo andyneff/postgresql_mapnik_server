@@ -20,7 +20,7 @@ def parser():
   aa('--bbox', nargs=4, default=[110.5, -39.6, 158.2, -10.3], type=float,
      help="Bounding box, in degrees, W,S,E,N order")
   aa('--map', default='osm.xml')
-  aa('--output', '-o', default='image.png')
+  aa('--output', '-o', default='/output/image.png')
   aa('--size', nargs=2, default=[5000, 5000], help="Size in pixels (w x h)")
   return parser
 
